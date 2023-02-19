@@ -24,7 +24,7 @@ ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species)) +
 ```R
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(cyl))) +
   geom_point(size = 4) +
-  theme_monokai_dark_horizontal() +
+  theme_monokai_dark() +
   scale_color_monokai(palette = "dark") +
   labs(
     title = "Car Weight vs. Miles per Gallon",
