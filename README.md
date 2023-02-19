@@ -1,8 +1,18 @@
 # ggschemes
 
-Themes and scales for [ggplot2](https://github.com/tidyverse/ggplot2) based on popular color schemes. For example:
+Additional themes and scales for [ggplot2](https://github.com/tidyverse/ggplot2) based on popular color schemes. 
 
-## Dracula Dark Horizontal:
+## Installation
+
+The package is not on CRAN, but you can install it directly from github using
+
+```R
+devtools::install_github("kssrr/ggschemes")
+```
+
+## Examples
+
+### Dracula Dark Horizontal:
 
 ```R
 ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species)) +
@@ -19,7 +29,7 @@ ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species)) +
 
 ![dracula_dark_horizontal](https://user-images.githubusercontent.com/87900554/179606478-8cc315fc-e8fe-4753-b26f-e2ed7d8aee73.png)
 
-## Monokai Dark:
+### Monokai Dark:
 
 ```R
 ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(cyl))) +
@@ -39,7 +49,7 @@ ggplot(mtcars, aes(wt, mpg, color = factor(cyl), shape = factor(cyl))) +
 
 ![monokai_dark](https://user-images.githubusercontent.com/87900554/179606758-552b492b-24f1-4dc6-93eb-15b6de919245.png)
 
-## Dracula Light:
+### Dracula Light:
 
 ```R
 ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species)) +
@@ -56,7 +66,7 @@ ggplot(iris, aes(Sepal.Width, Sepal.Length, color = Species, shape = Species)) +
 
 ![dracula_light](https://user-images.githubusercontent.com/87900554/179606842-e24fa186-e4f8-41c5-9a5a-c137db28a79b.png)
 
-## Gruvbox Light Horizontal:
+### Gruvbox Light Horizontal:
 
 ```R
 ggplot(mpg, aes(cty, hwy)) +
