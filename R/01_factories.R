@@ -18,11 +18,11 @@
 #' my_color <- make_colorscheme(my_colors)
 #' my_color("black")
 #' @export
-make_colorscheme <- function(.colorscheme) {
+make_colorscheme <- function (.colorscheme) {
   
   force(.colorscheme)
   
-  function(...) {
+  function (...) {
     cols <- c(...)
     
     if (is.null(cols))

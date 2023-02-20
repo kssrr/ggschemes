@@ -3,3 +3,7 @@ Type: Package
 Title: Additional color schemes, themes & scales for ggplot2
 Version: 0.0.1.0
 RoxygenNote: 7.2.3.9000
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

@@ -1,0 +1,202 @@
+---
+title: "ggschemes"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ggschemes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ggschemes)
+library(ggplot2)
+```
+
+This vignette introduces the basics of (1) using `ggschemes`' built-in themes and scales with `ggplot2`-objects, and (2) building your own themes, color schemes, palettes & color scales using the tools `ggschemes` provides.
+
+# Using pre-built themes and color scales
+
+The themes and scales provided by `ggschemes` can be used mostly interchangeably with other themes and scales for `ggplot2`. Out of the box, `ggschemes` provides three color schemes, each coming with four themes: `theme_*_light()`, `theme_*_light_horizontal()`, `theme_*_dark()`, and `theme_*_dark_horizontal()`. They only have one argument, `...`, which is used to pass all arguments given directly to `theme()`. All color schemes also come with two scale functions: `scale_color_*()`, for color, and `scale_fill_*()`, for fill aesthetics. They have three arguments: `palette`, for the color palette (defaults to "light"), `discrete`, taking a logical value, for choosing discrete vs. continuous color scales (I think this is more convenient than separate functions), and `reverse`, in case you want to reverse the palette colors. Let's look at some examples!
+
+## Building a simple plot
+
+The themes can simply be added to a `ggplot()`-call as a layer, like any other theme:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg)) +
+  geom_point() +
+  theme_dracula_light()          # <-
+```
+
+To use the color scales, like with any color scale, you first add an aesthetic mapping for color, and then add the color scale as extra layer:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = factor(cyl))) + # <-
+  geom_point() +
+  theme_dracula_light() +
+  scale_color_dracula()                               # <-
+```
+
+Let's say you switch to the dark theme; you may want to switch to the dark palette as well:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = factor(cyl))) + 
+  geom_point() +
+  theme_dracula_dark() +                              # <-
+  scale_color_dracula(palette = "dark")               # <-
+```
+
+
+The color scale can also display continuous values. You may want to pick a palette that works well with continuous values (the function will automatically interpolate between color values). 
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = mpg)) +         # <- 
+  geom_point() +
+  theme_dracula_dark() +
+  scale_color_dracula(palette = "rank", discrete = F) # <-  
+```
+
+You can also manually create your own scales by accessing individual colors from the color scheme. To check what colors are available, simply call the name of the color scheme:
+
+```{r}
+dracula()
+```
+
+One exception here is `gruvbox`, which has a light and a dark variant:
+
+```{r}
+gruvbox$light()
+gruvbox$dark()
+```
+
+For example, you can create you own gradient color scale:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = mpg)) +
+  geom_point() +
+  theme_dracula_dark() +
+  scale_color_gradient(low = dracula("pink"), high = dracula("cyan")) # <- 
+```
+
+# Creating your own color schemes, palettes & themes
+
+`ggschemes` also provides a number of convenience functions to make creating your own color schemes, palettes & themes much easier. This section will introduce these ideas. First, create a named vector holding the color names and hexcodes for your palette:
+
+```{r}
+my_colors <- c(
+  `black` = "#2e2e2e",
+  `white` = "#d6d6d6", 
+  `yellow` = "#e5b567",
+  `green` = "#b4d273",
+  `orange` = "#e87d3e",
+  `purple` = "#9e86c8",
+  `pink` = "#b05279",
+  `blue` = "#6c99bb",
+  `grey` = "#797979"
+)
+```
+
+Next, you can use the `make_colorscheme()` function factory to create a function which accesses the colors:
+
+```{r}
+my_color <- make_colorscheme(my_colors)
+```
+
+You can now access the colors from your palette by name:
+
+```{r}
+my_color("purple")
+my_color("purple", "pink")
+my_color()
+```
+
+Next, you can assemble some palettes from your colors & put them into a list:
+
+```{r}
+my_palettes <- list(
+  `light` = my_color("yellow", "green", "orange", "purple", "pink", "blue"),
+  `dark` = my_color("yellow", "green", "orange", "purple", "pink", "blue"),
+  `cold` = my_color("white", "blue"),
+  `warm` = my_color("yellow", "pink"),
+  `rank` = my_color("pink", "green")
+)
+```
+
+You can now create a function to access these palettes:
+
+```{r}
+my_pal <- make_palette(my_palettes)
+```
+
+...which you can use to construct color & fill scales:
+
+```{r}
+my_color_scale <- make_color_scale(
+  .palette_fun = my_pal,
+  .name_pref = "my_"
+)
+
+my_fill_scale <- make_fill_scale(
+  .palette_fun = my_pal,
+  .name_pref = "my_"
+)
+```
+
+We can now already use the color & fill scales with `ggplot()`:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point() +
+  my_color_scale()  # <- 
+```
+
+Let's create a theme. `ggschemes` includes two factories: `make_dark_theme()` and `make_light_theme()`. We will stick with the light theme for now. The function has a `.template` argument to select a template to base the theme on. `ggschemes` comes with two built-in templates, `theme_template()` and `theme_template_horizontal()`, but you can use any theme as template or create your own using `ggplot2::theme()`. You will also need to specify a number of colors:
+
+```{r}
+my_light_theme <- make_light_theme(
+  .template = theme_template(),
+  .black = my_color("black"),
+  .grey = my_color("grey"),
+  .lgrey = my_color("grey"),  # sometimes a separate light grey is nice for contrast!
+  .white = my_color("white")
+)
+```
+
+The theme can now be used with a plot:
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point() +
+  my_light_theme() +  # <- 
+  my_color_scale()
+```
+
+If you dislike the templates, you can either create your own template, or overwrite parts of the theme with a separate call to `ggplot2::theme()` as extra layer (for example, removing axis lines & ticks):
+
+```{r}
+mtcars |> 
+  ggplot(aes(x = wt, y = mpg, color = factor(cyl))) +
+  geom_point() +
+  my_light_theme() +
+  my_color_scale() +
+  theme(                          # <- 
+    axis.line = element_blank(),  # <- 
+    axis.ticks = element_blank()  # <- 
+  )                               # <- 
+```
+
+All functions are written with flexibility and compatibility with other `ggplot2` functions in mind, to enable these kinds of things. If you want to extend `ggschemes` or use it to build your own themes & color palettes, I suggest you also look at the source code for the existing ones; the basic workflow is identical to what was presented here. 
