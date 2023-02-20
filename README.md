@@ -1,6 +1,6 @@
 # ggschemes
 
-Additional themes and scales for [ggplot2](https://github.com/tidyverse/ggplot2) based on popular color schemes. 
+This package includes additional themes and scales for [ggplot2](https://github.com/tidyverse/ggplot2) based on popular color schemes, as well as tools to easily make your own. For a proper introduction, read the package vignette.
 
 ## Installation
 
